@@ -84,6 +84,9 @@ public class DriveThruSpeechlet implements Speechlet {
 
         initializeComponents();
 
+        // if user said a one shot command that triggered an intent event,
+        // it will start a new session, and then we should avoid speaking too many words.
+        skillContext.setNeedsMoreHelp(false);
     }
 
     @Override

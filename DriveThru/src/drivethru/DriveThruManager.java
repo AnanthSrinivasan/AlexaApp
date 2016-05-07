@@ -33,20 +33,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
  * game.
  */
 public class DriveThruManager {
-    /**
-     * Intent slot for player name.
-     */
-    private static final String SLOT_PLAYER_NAME = "PlayerName";
-
-    /**
-     * Intent slot for player score.
-     */
-    private static final String SLOT_SCORE_NUMBER = "ScoreNumber";
-
-    /**
-     * Maximum number of players for which scores must be announced while adding a score.
-     */
-    private static final int MAX_PLAYERS_FOR_SPEECH = 3;
 
     private final ScoreKeeperDao scoreKeeperDao;
 
@@ -70,46 +56,18 @@ public class DriveThruManager {
         // based on whether there are players or not.
         String speechText, repromptText;
 
-	    speechText = "Good Evening..., May I know your name ?";
-	    repromptText = "May I know your name ? ";
+        speechText = "Hello, Welcome to Sata Drive, Whom do I have the pleasure of working with today ?";
+        repromptText = "May I know your name ? ";
 
         return getAskSpeechletResponse(speechText, repromptText);
     }
 
-    /**
-     * Returns an ask Speechlet response for a speech and reprompt text.
-     *
-     * @param speechText
-     *            Text for speech output
-     * @param repromptText
-     *            Text for reprompt output
-     * @return ask Speechlet response for a speech and reprompt text
-     */
-    private SpeechletResponse getAskSpeechletResponse(String speechText, String repromptText) {
-        // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("Session");
-        card.setContent(speechText);
-
-        // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
-
-        // Create reprompt
-        PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
-        repromptSpeech.setText(repromptText);
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(repromptSpeech);
-
-        return SpeechletResponse.newAskResponse(speech, reprompt, card);
-    }
-
     public SpeechletResponse getUserNameIntentResponse(Intent intent, Session session, SkillContext skillContext) {
         // Speak welcome message and ask user questions
-        // based on whether there are players or not.
         String speechText, repromptText;
 
-	    speechText = "Your Intent is started...";
+//        scoreKeeperDao
+	    speechText = "Welcome... ? ";
 	    repromptText = "Can you please give me your order ?";
 
         return getAskSpeechletResponse(speechText, repromptText);
@@ -148,9 +106,37 @@ public class DriveThruManager {
     public SpeechletResponse getExitIntentResponse(Intent intent, Session session,
             SkillContext skillContext) {
         return skillContext.needsMoreHelp() ? getTellSpeechletResponse("Okay. Whenever you're "
-                + "ready, you can start giving points to the players in your game.")
+                + "ready, you can start placing your order.")
                 : getTellSpeechletResponse("");
     }    
+
+    /**
+     * Returns an ask Speechlet response for a speech and reprompt text.
+     *
+     * @param speechText
+     *            Text for speech output
+     * @param repromptText
+     *            Text for reprompt output
+     * @return ask Speechlet response for a speech and reprompt text
+     */
+    private SpeechletResponse getAskSpeechletResponse(String speechText, String repromptText) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Session");
+        card.setContent(speechText);
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+        speech.setText(speechText);
+
+        // Create reprompt
+        PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+        repromptSpeech.setText(repromptText);
+        Reprompt reprompt = new Reprompt();
+        reprompt.setOutputSpeech(repromptSpeech);
+
+        return SpeechletResponse.newAskResponse(speech, reprompt, card);
+    }
     
     /**
      * Returns a tell Speechlet response for a speech and reprompt text.
@@ -172,60 +158,4 @@ public class DriveThruManager {
         return SpeechletResponse.newTellResponse(speech, card);
     }
 
-    /**
-     * Converts a {@link Map} of scores into text for speech. The order of the entries in the text
-     * is determined by the order of entries in {@link Map#entrySet()}.
-     *
-     * @param scores
-     *            A {@link Map} of scores
-     * @return a speech ready text containing scores
-     */
-    private String getAllScoresAsSpeechText(Map<String, Long> scores) {
-        StringBuilder speechText = new StringBuilder();
-        int index = 0;
-        for (Entry<String, Long> entry : scores.entrySet()) {
-            if (scores.size() > 1 && index == scores.size() - 1) {
-                speechText.append(" and ");
-            }
-            String singularOrPluralPoints = entry.getValue() == 1 ? " point, " : " points, ";
-            speechText
-                    .append(entry.getKey())
-                    .append(" has ")
-                    .append(entry.getValue())
-                    .append(singularOrPluralPoints);
-            index++;
-        }
-
-        return speechText.toString();
-    }
-
-    /**
-     * Creates and returns a {@link Card} with a formatted text containing all scores in the game.
-     * The order of the entries in the text is determined by the order of entries in
-     * {@link Map#entrySet()}.
-     *
-     * @param scores
-     *            A {@link Map} of scores
-     * @return leaderboard text containing all scores in the game
-     */
-    private Card getLeaderboardScoreCard(Map<String, Long> scores) {
-        StringBuilder leaderboard = new StringBuilder();
-        int index = 0;
-        for (Entry<String, Long> entry : scores.entrySet()) {
-            index++;
-            leaderboard
-                    .append("No. ")
-                    .append(index)
-                    .append(" - ")
-                    .append(entry.getKey())
-                    .append(" : ")
-                    .append(entry.getValue())
-                    .append("\n");
-        }
-
-        SimpleCard card = new SimpleCard();
-        card.setTitle("Leaderboard");
-        card.setContent(leaderboard.toString());
-        return card;
-    }
 }
