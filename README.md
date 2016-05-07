@@ -5,7 +5,7 @@ Install Brew: </br>
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 Install Maven: </br>
-brew update
+brew update </br>
 brew install maven
 
 Add the below line to your ~/.bashrc </br>
